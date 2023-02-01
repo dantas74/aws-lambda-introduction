@@ -16,7 +16,7 @@ data "archive_file" "todos" {
 
   output_path = "files/${each.key}-todo-artifact.zip"
   type        = "zip"
-  source_dir  = "${local.lambdas_path}/${each.key}.py"
+  source_file = "${local.lambdas_path}/${each.key}.py"
 }
 
 resource "aws_lambda_function" "todos" {
@@ -35,4 +35,24 @@ resource "aws_lambda_function" "todos" {
   memory_size = each.value["memory"]
 
   layers = [aws_lambda_layer_version.shared.arn]
+
+  tracing_config {
+    mode = "Active"
+  }
+
+  environment {
+    variables = {
+      "TABLE" = aws_ssm_parameter.table.name
+      "DEBUG" = var.env == "dev"
+    }
+  }
+}
+
+resource "aws_lambda_permission" "api" {
+  for_each = local.lambdas
+
+  action        = "lambda:InvokeFunction"
+  function_name = aws_lambda_function.todos[each.key].arn
+  principal     = "apigateway.amazonaws.com"
+  source_arn    = "arn:aws:execute-api:${var.aws_region}:${var.aws_account_id}:*/*"
 }

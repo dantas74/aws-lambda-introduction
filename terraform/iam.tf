@@ -14,7 +14,7 @@ resource "aws_iam_role" "rest_api_role" {
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
 }
 
-data "aws_iam_policy_document" "create_logs_cloudwatch" {
+data "aws_iam_policy_document" "lambda_permissions" {
   statement {
     sid       = "AllowCreatingLogGroups"
     effect    = "Allow"
@@ -32,14 +32,47 @@ data "aws_iam_policy_document" "create_logs_cloudwatch" {
       "logs:PutLogEvents"
     ]
   }
+
+  statement {
+    effect    = "Allow"
+    resources = ["*"]
+    actions = [
+      "dynamodb:ListTables",
+      "ssm:DescribeParameters",
+      "xray:PutTraceSegments"
+    ]
+  }
+
+  statement {
+    effect    = "Allow"
+    resources = ["arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id}:table/${aws_dynamodb_table.this.name}"]
+    actions = [
+      "dynamodb:PutItem",
+      "dynamodb:DescribeTable",
+      "dynamodb:DeleteItem",
+      "dynamodb:GetItem",
+      "dynamodb:Scan",
+      "dynamodb:Query",
+      "dynamodb:UpdateItem",
+    ]
+  }
+
+  statement {
+    effect    = "Allow"
+    resources = ["arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter/${aws_ssm_parameter.table.name}"]
+    actions = [
+      "ssm:GetParameter",
+      "ssm:GetParameters",
+    ]
+  }
 }
 
-resource "aws_iam_policy" "create_logs_cloudwatch" {
+resource "aws_iam_policy" "api_permissions_cloudwatch" {
   name   = "${local.namespaced_service_name}-policy"
-  policy = data.aws_iam_policy_document.create_logs_cloudwatch.json
+  policy = data.aws_iam_policy_document.lambda_permissions.json
 }
 
 resource "aws_iam_role_policy_attachment" "api_cloudwatch" {
-  policy_arn = aws_iam_policy.create_logs_cloudwatch.arn
+  policy_arn = aws_iam_policy.api_permissions_cloudwatch.arn
   role       = aws_iam_role.rest_api_role.name
 }

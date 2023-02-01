@@ -1,2 +1,5 @@
 .idea/
 **/__pycache__
+terraform/.terraform*
+terraform/*.tfstate
+terraform/*.tfvars

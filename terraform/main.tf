@@ -1,7 +1,3 @@
-terraform {
-  required_version = "1.0.5"
-}
-
 provider "aws" {
   region  = var.aws_region
   profile = var.aws_profile
@@ -9,10 +5,10 @@ provider "aws" {
   default_tags {
     tags = {
       "Project"     = "Serverless REST API Example"
-      "Created At"  = "2021-09-05"
+      "Created At"  = "2023-02-01"
       "Managed By"  = "Terraform"
       "Owner"       = "Dantas"
-      "Environment" = var.environment
+      "Environment" = var.env
     }
   }
 }
