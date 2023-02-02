@@ -1,14 +1,15 @@
 data "archive_file" "shared_layer" {
   output_path = "files/shared-layer.zip"
   type        = "zip"
-  source_dir  = "${local.layer_path}/shared"
+  source_dir  = local.layer_path
 }
 
 resource "aws_lambda_layer_version" "shared" {
-  layer_name       = "shared-layer"
-  description      = "Shared layer for functions"
-  filename         = data.archive_file.shared_layer.output_path
-  source_code_hash = data.archive_file.shared_layer.output_base64sha256
+  layer_name          = "shared-layer"
+  description         = "Shared layer for functions"
+  filename            = data.archive_file.shared_layer.output_path
+  source_code_hash    = data.archive_file.shared_layer.output_base64sha256
+  compatible_runtimes = ["python3.9"]
 }
 
 data "archive_file" "todos" {

@@ -13,14 +13,13 @@ ssm = boto3.client('ssm')
 
 
 @treatment
-def handler(event):
+def handler(event, _context):
     table = ssm.get_parameter(Name=os.getenv('TABLE'))['Parameter']['Value']
 
     normalized_event = normalize_event(event)
-    path_parameters = normalized_event['path_parameters']
     data = normalized_event['data']
 
-    todo_id = path_parameters['todoId']
+    todo_id = data['todoId']
 
     params = {
         'TableName': table,

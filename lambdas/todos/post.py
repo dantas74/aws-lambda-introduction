@@ -13,8 +13,9 @@ ssm = boto3.client('ssm')
 
 
 @treatment
-def handler(event):
+def handler(event, _context):
     table = ssm.get_parameter(Name=os.getenv('TABLE'))['Parameter']['Value']
+
     data = normalize_event(event)['data']
 
     params = {

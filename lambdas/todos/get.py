@@ -2,7 +2,6 @@ import json
 import os
 
 import boto3
-
 from shared.decorators.treatment import treatment
 from shared.utils.python.normalizer import normalize_event
 from shared.utils.python.reponse import response
@@ -12,7 +11,7 @@ ssm = boto3.client('ssm')
 
 
 @treatment
-def handler(event):
+def handler(event, _context):
     table = ssm.get_parameter(Name=os.getenv('TABLE'))['Parameter']['Value']
     path_parameters = normalize_event(event)['path_parameters']
 

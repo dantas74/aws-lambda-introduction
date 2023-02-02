@@ -28,9 +28,7 @@ resource "aws_apigatewayv2_route" "todos" {
 }
 
 resource "aws_apigatewayv2_route" "todo_get" {
-  for_each = local.lambdas
-
   api_id    = aws_apigatewayv2_api.this.id
-  route_key = "${upper(each.key)} /v1/todos/{todoId}"
+  route_key = "GET /v1/todos/{todoId}"
   target    = "integrations/${aws_apigatewayv2_integration.todos["get"].id}"
 }
