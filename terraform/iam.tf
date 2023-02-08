@@ -36,33 +36,10 @@ data "aws_iam_policy_document" "lambda_permissions" {
   statement {
     effect    = "Allow"
     resources = ["*"]
-    actions = [
+    actions   = [
       "dynamodb:ListTables",
       "ssm:DescribeParameters",
       "xray:PutTraceSegments"
-    ]
-  }
-
-  statement {
-    effect    = "Allow"
-    resources = ["arn:aws:dynamodb:${var.aws_region}:${var.aws_account_id}:table/${aws_dynamodb_table.this.name}"]
-    actions = [
-      "dynamodb:PutItem",
-      "dynamodb:DescribeTable",
-      "dynamodb:DeleteItem",
-      "dynamodb:GetItem",
-      "dynamodb:Scan",
-      "dynamodb:Query",
-      "dynamodb:UpdateItem",
-    ]
-  }
-
-  statement {
-    effect    = "Allow"
-    resources = ["arn:aws:ssm:${var.aws_region}:${var.aws_account_id}:parameter/${aws_ssm_parameter.table.name}"]
-    actions = [
-      "ssm:GetParameter",
-      "ssm:GetParameters",
     ]
   }
 }

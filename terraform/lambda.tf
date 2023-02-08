@@ -23,8 +23,8 @@ data "archive_file" "lambdas" {
 resource "aws_lambda_function" "this" {
   for_each = {
     for file_path in local.lambdas : file_path => {
-      function_name    = "dynamodb-${split("/", file_path)[1]}-${split(".", split("/", file_path)[2])[0]}-item"
-      handler          = "${split(".", split("/", file_path)[2])[0]}.handler"
+      function_name    = "dynamodb-${replace(join("-", slice(split("/", file_path), 1, length(split("/", file_path)) - 1)), "_", "")}-${split(".", split("/", file_path)[length(split("/", file_path)) - 1])[0]}-item"
+      handler          = "${split(".", split("/", file_path)[length(split("/", file_path)) - 1])[0]}.handler"
       filename         = data.archive_file.lambdas[file_path].output_path
       source_code_hash = data.archive_file.lambdas[file_path].output_base64sha256
       timeout          = contains(local.get_functions, file_path) ? 10 : 5
@@ -51,7 +51,6 @@ resource "aws_lambda_function" "this" {
 
   environment {
     variables = {
-      "TABLE" = aws_ssm_parameter.table.name
       "DEBUG" = var.env == "dev"
     }
   }

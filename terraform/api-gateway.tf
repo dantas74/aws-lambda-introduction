@@ -22,20 +22,7 @@ resource "aws_apigatewayv2_integration" "this" {
 resource "aws_apigatewayv2_route" "this" {
   for_each = {
     for file_path in local.lambdas : file_path => {
-      route_key = "${upper(split(".", split("/", file_path)[2])[0])} /${split("/", file_path)[0]}/${split("/", file_path)[1]}"
-      target    = "integrations/${aws_apigatewayv2_integration.this[file_path].id}"
-    }
-  }
-
-  api_id    = aws_apigatewayv2_api.this.id
-  route_key = each.value["route_key"]
-  target    = each.value["target"]
-}
-
-resource "aws_apigatewayv2_route" "this_gets" {
-  for_each = {
-    for file_path in local.get_functions : file_path => {
-      route_key = "GET /${split("/", file_path)[0]}/${split("/", file_path)[1]}/{id}"
+      route_key = "${upper(split(".", split("/", file_path)[length(split("/", file_path)) - 1])[0])} /${split("/", file_path)[0]}/${replace(replace(join("/", slice(split("/", file_path), 1, length(split("/", file_path)) - 1)), "__", "}"), "_", "{")}"
       target    = "integrations/${aws_apigatewayv2_integration.this[file_path].id}"
     }
   }
