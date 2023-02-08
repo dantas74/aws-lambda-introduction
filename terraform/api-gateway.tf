@@ -10,7 +10,7 @@ resource "aws_apigatewayv2_stage" "this" {
 }
 
 resource "aws_apigatewayv2_integration" "this" {
-  for_each = local.lambdas2
+  for_each = local.lambdas
 
   api_id                 = aws_apigatewayv2_api.this.id
   integration_type       = "AWS_PROXY"
@@ -21,7 +21,7 @@ resource "aws_apigatewayv2_integration" "this" {
 
 resource "aws_apigatewayv2_route" "this" {
   for_each = {
-    for file_path in local.lambdas2 : file_path => {
+    for file_path in local.lambdas : file_path => {
       route_key = "${upper(split(".", split("/", file_path)[2])[0])} /${split("/", file_path)[0]}/${split("/", file_path)[1]}"
       target    = "integrations/${aws_apigatewayv2_integration.this[file_path].id}"
     }

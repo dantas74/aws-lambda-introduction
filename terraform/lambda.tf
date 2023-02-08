@@ -13,7 +13,7 @@ resource "aws_lambda_layer_version" "shared" {
 }
 
 data "archive_file" "lambdas" {
-  for_each = local.lambdas2
+  for_each = local.lambdas
 
   output_path = "files/${each.value}-artifact.zip"
   type        = "zip"
@@ -22,7 +22,7 @@ data "archive_file" "lambdas" {
 
 resource "aws_lambda_function" "this" {
   for_each = {
-    for file_path in local.lambdas2 : file_path => {
+    for file_path in local.lambdas : file_path => {
       function_name    = "dynamodb-${split("/", file_path)[1]}-${split(".", split("/", file_path)[2])[0]}-item"
       handler          = "${split(".", split("/", file_path)[2])[0]}.handler"
       filename         = data.archive_file.lambdas[file_path].output_path
