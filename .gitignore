@@ -3,4 +3,5 @@
 terraform/.terraform*
 terraform/*.tfstate*
 terraform/*.tfvars
-terraform/files/*.zip
+terraform/files/**/*.zip
+layer/python/shared.egg-info
