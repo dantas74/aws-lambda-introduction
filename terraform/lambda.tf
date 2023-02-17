@@ -4,11 +4,25 @@ data "archive_file" "shared_layer" {
   source_dir  = local.layer_path
 }
 
+data "archive_file" "lib_layer" {
+  output_path = "files/lib-layer.zip"
+  type        = "zip"
+  source_dir  = local.lib_path
+}
+
 resource "aws_lambda_layer_version" "shared" {
   layer_name          = "shared-layer"
   description         = "Shared layer for functions"
   filename            = data.archive_file.shared_layer.output_path
   source_code_hash    = data.archive_file.shared_layer.output_base64sha256
+  compatible_runtimes = ["python3.9"]
+}
+
+resource "aws_lambda_layer_version" "lib" {
+  layer_name          = "lib"
+  description         = "Library layer for functions"
+  filename            = data.archive_file.lib_layer.output_path
+  source_code_hash    = data.archive_file.lib_layer.output_base64sha256
   compatible_runtimes = ["python3.9"]
 }
 
@@ -43,7 +57,7 @@ resource "aws_lambda_function" "this" {
   timeout     = each.value["timeout"]
   memory_size = each.value["memory"]
 
-  layers = [aws_lambda_layer_version.shared.arn]
+  layers = [aws_lambda_layer_version.shared.arn, aws_lambda_layer_version.lib.arn]
 
   tracing_config {
     mode = "Active"

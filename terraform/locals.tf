@@ -3,6 +3,7 @@ locals {
 
   lambdas_path = "${path.module}/../lambdas"
   layer_path   = "${path.module}/../layer"
+  lib_path     = "${path.module}/../lib"
 
   get_functions    = fileset(local.lambdas_path, "**/get.py")
   post_functions   = fileset(local.lambdas_path, "**/post.py")

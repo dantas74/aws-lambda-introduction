@@ -1,10 +1,11 @@
+import base64
 import json
 
 
 def normalize_event(event):
+    body = event['body']
+
     return {
         'method': event['requestContext']['http']['method'],
-        'data': json.loads(event['body']) if event['body'] else {},
-        'query_string': event['queryStringParameters'] or {},
-        'path_params': event['pathParameters'] or {}
+        'data': json.loads(base64.b64decode(body)) if event['body'] else {}
     }
